@@ -1,0 +1,160 @@
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:encrypt/encrypt.dart';
+import 'package:crypto/crypto.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('userBox');
+  runApp(MyApp());
+}
+
+class User {
+  String email;
+  String password;
+
+  User(this.email, this.password);
+
+  User.fromMap(Map<String, dynamic> map)
+      : email = map['email'],
+        password = map['password'];
+
+  Map<String, dynamic> toMap() {
+    return {'email': email, 'password': password};
+  }
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: RegistrationPage(),
+    );
+  }
+}
+
+class RegistrationPage extends StatelessWidget {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Registration'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FormBuilder(
+          key: _fbKey,
+          child: Column(
+            children: <Widget>[
+              FormBuilderTextField(
+                name: 'email',
+                decoration: InputDecoration(labelText: 'Email'),
+                validator: FormBuilderValidators.required(),
+              ),
+              FormBuilderTextField(
+                name: 'password',
+                decoration: InputDecoration(labelText: 'Password'),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                  (val) {
+                    if (val!.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
+                ]),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_fbKey.currentState!.saveAndValidate()) {
+                    final formData = _fbKey.currentState!.value;
+                    final user = User(formData['email'], formData['password']);
+                    final userBox = await Hive.openBox('userBox');
+                    userBox.add(user.toMap());
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                  }
+                },
+                child: Text('Register'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LoginPage extends StatelessWidget {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FormBuilder(
+          key: _fbKey,
+          child: Column(
+            children: <Widget>[
+              FormBuilderTextField(
+                name: 'email',
+                decoration: InputDecoration(labelText: 'Email'),
+                validator: FormBuilderValidators.required(),
+              ),
+              FormBuilderTextField(
+                name: 'password',
+                decoration: InputDecoration(labelText: 'Password'),
+                validator: FormBuilderValidators.required(),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_fbKey.currentState!.saveAndValidate()) {
+                    final formData = _fbKey.currentState!.value;
+                    final userBox = await Hive.openBox('userBox');
+                    final users = userBox.values.map((userMap) => User.fromMap(userMap));
+                    final enteredEmail = formData['email'];
+                    final enteredPassword = formData['password'];
+                    final user = users.firstWhere(
+                        (user) => user.email == enteredEmail,
+                        orElse: () => null);
+                    if (user != null &&
+                        verifyPassword(enteredPassword, user.password)) {
+                      // Successfully logged in.
+                      print('Login Successful');
+                    } else {
+                      // Failed login.
+                      print('Login Failed');
+                    }
+                  }
+                },
+                child: Text('Login'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+final key = Key.fromUtf8('YourEncryptionKey');
+final iv = IV.fromLength(16);
+
+String encryptPassword(String password) {
+  final encrypter = Encrypter(AES(key));
+  final encrypted = encrypter.encrypt(password, iv: iv);
+  return encrypted.base64;
+}
+
+bool verifyPassword(String enteredPassword, String storedPassword) {
+  final encrypter = Encrypter(AES(key));
+  final decrypted = encrypter.decrypt(Encrypted.fromBase64(storedPassword), iv: iv);
+  return decrypted == enteredPassword;
+}
