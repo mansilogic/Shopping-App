@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:encrypt/encrypt.dart';
-import 'package:crypto/crypto.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shoppingapp/screens/login.dart';
 import 'package:shoppingapp/screens/signup.dart';
@@ -18,6 +15,13 @@ void main() async {
 
   Hive.registerAdapter(NodesModelAdapter());
   await Hive.openBox<NodesModel>('notes');
+
+  Hive.registerAdapter(ProductAdapter());
+  await Hive.openBox<Product>('product');
+
+  Hive.registerAdapter(CartItemAdapter());
+  await Hive.openBox<CartItem>('addToCart');
+
   runApp(const MaterialApp(home: MyApp()));
 }
 
@@ -30,6 +34,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: const Center(
@@ -37,7 +42,7 @@ class MyApp extends StatelessWidget {
             'JUST DO SHOPPING',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           )),
-           ),
+        ),
         body: SafeArea(
           child: Container(
             width: double.infinity,
@@ -84,7 +89,7 @@ class MyApp extends StatelessWidget {
                         height: 60,
                         color: const Color.fromARGB(255, 39, 216, 98),
                         shape: RoundedRectangleBorder(
-                            side:const BorderSide(
+                            side: const BorderSide(
                               color: Colors.black,
                             ),
                             borderRadius: BorderRadius.circular(40)),
@@ -106,7 +111,7 @@ class MyApp extends StatelessWidget {
                     MaterialButton(
                         minWidth: double.infinity,
                         height: 60,
-                        color:const Color.fromARGB(255, 39, 216, 98),
+                        color: const Color.fromARGB(255, 39, 216, 98),
                         shape: RoundedRectangleBorder(
                             side: const BorderSide(
                               color: Colors.black,

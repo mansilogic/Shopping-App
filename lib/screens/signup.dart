@@ -95,21 +95,21 @@ class _SignUpState extends State<SignUp> {
                                   ],
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 40),
+                                  padding:const EdgeInsets.symmetric(horizontal: 40),
                                   child: Column(children: [
                                     const SizedBox(
                                       height: 25,
                                     ),
                                     Row(
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Name',
                                           style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w500,
                                               color: Colors.black87),
                                         ),
-                                           const SizedBox(width: 10), // Add some spacing
+                                        const SizedBox(width: 10), // Add some spacing
                               
                                       ],
                                     ),

@@ -1,4 +1,10 @@
+// ignore_for_file: sized_box_for_whitespace
+
 import 'package:flutter/material.dart';
+import 'package:shoppingapp/main.dart';
+import 'package:shoppingapp/screens/cartitem.dart';
+import 'package:shoppingapp/screens/login.dart';
+import 'package:shoppingapp/screens/manageproduct.dart';
 
 void main() => runApp(const BottomNavigationApp());
 
@@ -24,20 +30,20 @@ class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Cart',
-      style: optionStyle,
-    ),
-    Text(
-      'Manage Product',
-      style: optionStyle,
-    ),
-  ];
+  // static const List<Widget> _widgetOptions = <Widget>[
+  //   Text(
+  //     'Home',
+  //     style: optionStyle,
+  //   ),
+  //   Text(
+  //     'Cart',
+  //     style: optionStyle,
+  //   ),
+  //   Text(
+  //     'Manage Product',
+  //     style: optionStyle,
+  //   ),
+  // ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -72,16 +78,20 @@ class _BottomNavigationState extends State<BottomNavigation> {
                   child: Text('Drawer Header'),
                 ),
                 ListTile(
-                  leading:const Icon(
-                    Icons.home,
+                  leading: const Icon(
+                    Icons.logout_rounded,
                   ),
-                  title: const Text('Page 1'),
+                  title: const Text('Log Out'),
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const MyApp(),
+                      ),
+                    );
                   },
                 ),
                 ListTile(
-                  leading:const Icon(
+                  leading: const Icon(
                     Icons.train,
                   ),
                   title: const Text('Page 2'),
@@ -121,4 +131,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
       ),
     );
   }
+
+  final List<Widget> _widgetOptions = <Widget>[
+    CartItem(),
+    Center(
+      child: Text(
+        'Cart',
+        style: optionStyle,
+      ),
+    ),
+    // Manage Product screen within the BottomNavigationBar
+    ManageProduct(),
+  ];
 }

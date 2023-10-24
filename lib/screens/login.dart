@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:hive/hive.dart';
 import 'package:shoppingapp/screens/homepage.dart';
+import 'package:shoppingapp/screens/manageproduct.dart';
 
 import '../models/nodes_model.dart';
 
