@@ -4,17 +4,18 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shoppingapp/models/nodes_model.dart';
 import 'package:shoppingapp/boxes/boxes.dart';
 
-class CartItem extends StatefulWidget {
+class CartItems extends StatefulWidget {
   @override
-  _CartItemState createState() => _CartItemState();
+  _CartItemsState createState() => _CartItemsState();
 }
 
-class _CartItemState extends State<CartItem> {
+class _CartItemsState extends State<CartItems> {
   final productNameController = TextEditingController();
   String selectedProduct = '';
-  double selectedProductPrice = 0.0;
+  int selectedProductPrice = 0;
+  
   int quantity = 1;
-  double total = 0.0;
+  int total = 0;
 
   @override
   void initState() {
@@ -46,30 +47,21 @@ class _CartItemState extends State<CartItem> {
                         setState(() {
                           selectedProduct = newvalue!;
                           selectedProductPrice =
-                              _getProductPrice(selectedProduct);
+                              _getProductPrice(selectedProduct).toInt();
                           _updateTotal();
+                          print(_productNames);
+                          productNameController.text = selectedProduct;
                         });
                       },
-                      // items: _productNames.asMap().entries.map((entry) {
-                      //   int index = entry.key;
-                      //   String product = entry.value;
-                      //   print(_productNames);
-                      //   return DropdownMenuItem<String>(
-                      //     value:
-                      //         '$_productNames',
-                      //     child: Text(product),
-                      //   );
-                      // }).toList(),
-                       items: _productNames.map((product) {
+                      items: _productNames.map((product) {
                         return DropdownMenuItem<String>(
-                          value: product, // Ensure each value is unique
+                          value: product,
                           child: Text(product),
                         );
                       }).toList(),
-                     
                     ),
                     SizedBox(height: 20),
-                    Text('Price: \$${selectedProductPrice.toStringAsFixed(2)}'),
+                    Text('Price: \$${selectedProductPrice}'),
                     SizedBox(height: 20),
                     Text('Quantity:'),
                     Row(
@@ -99,32 +91,12 @@ class _CartItemState extends State<CartItem> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Text('Total: \$${total.toStringAsFixed(2)}'),
+                    Text('Total: \$${total}'),
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        if (selectedProduct != 'Select a product' &&
-                            quantity > 0) {
-                          Hive.openBox<CartItem>('addToCart');
-                          final cartBox = Hive.box<CartItem>('addToCart');
-                          final cartItem = CartItem(
-                            cartProductName: selectedProduct,
-                            cartPrice: selectedProductPrice,
-                            cartQuantity: quantity,
-                            totalAmount: total,
-                          );
-                          cartBox.add(cartItem);
-                          selectedProduct = 'Select a product';
-                          quantity = 1;
-                          total = 0.0;
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Please select a valid product and quantity.'),
-                            ),
-                          );
-                        }
+                       
+                        AddToYourCart(selectedProduct,selectedProductPrice,quantity,total);
                       },
                       child: Text('Add to Cart'),
                     ),
@@ -140,12 +112,48 @@ class _CartItemState extends State<CartItem> {
 
   List<String> _productNames = [];
 
-   void _getProductNames() {
+  void _getProductNames() {
     final productBox = Hive.box<Product>('product');
-    _productNames =
-        productBox.values.map((product) => product.productName).toSet().toList();
+    _productNames = productBox.values
+        .map((product) => product.productName)
+        .toSet()
+        .toList();
   }
 
+  Future<void> AddToYourCart(String selectedproduct, int selectedProductPrice,
+      int quantity, int totalAmount) async {
+  
+    if (selectedProduct != 'Select a product' && quantity > 0) {
+      final cartBox = Hive.box<CartItem>('addToCart');
+      final cartItem = CartItem(
+          cartProductName: selectedProduct,
+          cartPrice: selectedProductPrice,
+          cartQuantity: quantity,
+          totalAmount: totalAmount);
+      cartBox.add(cartItem);
+
+      final values = cartBox.values;
+
+                  for (var node in values) {
+                    print('cartProductName: ${node.cartProductName}');
+                    print('cartprice: ${node.cartPrice}');
+                    print('quantity: ${node.cartQuantity}');
+                    print('total: ${node.totalAmount}');
+                  }
+      setState(() {
+        selectedProduct = 'Select a product';
+        quantity=1;
+        total = 0;
+        selectedProductPrice=0;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select a valid product and quantity.'),
+        ),
+      );
+    }
+  }
 
   double _getProductPrice(String productName) {
     final productBox = Hive.box<Product>('product');

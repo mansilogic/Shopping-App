@@ -29,11 +29,16 @@ class _ManageProductState extends State<ManageProduct> {
             builder: (context, box, _) {
               box = Hive.box<Product>('product');
 
-              var data = box.values.toList().cast<Product>();
+              //var data = box.values.toList().cast<Product>();
+              var data = box.values
+                  .where((product) => product.productName != 'Select a product')
+                  .toList()
+                  .cast<Product>();
+
               return ListView.builder(
-                reverse: true,
+                reverse: false,
                 shrinkWrap: true,
-                itemCount: box.length,
+                itemCount: data.length,
                 itemBuilder: ((context, index) {
                   return Container(
                     child: Card(
@@ -46,13 +51,11 @@ class _ManageProductState extends State<ManageProduct> {
                               Expanded(
                                 child: Text(
                                   data[index].productName.toString(),
-                                  
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500),
                                 ),
                               ),
-                              
                               const Spacer(),
                               InkWell(
                                   onTap: () {
@@ -69,14 +72,13 @@ class _ManageProductState extends State<ManageProduct> {
                                     delete(data[index]);
                                   },
                                   child: const Icon(Icons.delete)),
-                                  
                             ],
                           ),
                           Text(
-                              data[index].price.toString(),
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w400),
-                            )
+                            data[index].price.toString(),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w400),
+                          )
                         ],
                       ),
                     ),
@@ -94,7 +96,8 @@ class _ManageProductState extends State<ManageProduct> {
     );
   }
 
-  Future<void> _editDialog(Product product, String productname, String price,String quantity) async {
+  Future<void> _editDialog(Product product, String productname, String price,
+      String quantity) async {
     await Hive.openBox<Product>('product');
     productNameController.text = productname;
     priceController.text = price;
@@ -159,22 +162,22 @@ class _ManageProductState extends State<ManageProduct> {
             actions: <Widget>[
               TextButton(
                   onPressed: () async {
-                   final price = double.tryParse(priceController.text);
-                   final quantity = int.tryParse(quantityController.text); 
-  
+                    final price = double.tryParse(priceController.text);
+                    final quantity = int.tryParse(quantityController.text);
+
                     if (price != null && quantity != null) {
+                      product.productName = productNameController.text;
+                      product.price = price;
+                      product.quantity = quantity;
+                      product.save();
 
-                    product.productName = productNameController.text;
-                    product.price = price;
-                    product.quantity = quantity;
-                    product.save();
+                      productNameController.clear();
+                      priceController.clear();
+                      quantityController.clear();
 
-                    productNameController.clear();
-                    priceController.clear();
-                    quantityController.clear();
-
-                    Navigator.of(context).pop();
-                    };
+                      Navigator.of(context).pop();
+                    }
+                    ;
                   },
                   child: const Text('Edit'))
             ],
@@ -209,7 +212,7 @@ class _ManageProductState extends State<ManageProduct> {
   }
 
   Future<void> _showMyDialog() async {
-      await showDialog(
+    await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -273,8 +276,9 @@ class _ManageProductState extends State<ManageProduct> {
                 onPressed: () {
                   final price = double.tryParse(priceController.text);
                   final quantity = int.tryParse(quantityController.text);
-  
-                  final data = Product(productNameController.text,price!, quantity!);
+
+                  final data =
+                      Product(productNameController.text, price!, quantity!);
 
                   final box = Hive.box<Product>('product');
                   box.add(data);
@@ -285,7 +289,7 @@ class _ManageProductState extends State<ManageProduct> {
                     print('price: ${node.price}');
                     print('quantity: ${node.quantity}');
                   }
-                 
+
                   productNameController.clear();
                   priceController.clear();
                   quantityController.clear();

@@ -58,7 +58,7 @@ class CartItem extends HiveObject {
   @HiveField(2)
   final int cartQuantity;
   @HiveField(3)
-  final double totalAmount;
+  final int totalAmount;
 
   CartItem(
       {required this.cartProductName,
@@ -67,15 +67,15 @@ class CartItem extends HiveObject {
       required this.totalAmount});
       
 
-  factory CartItem.fromMap(Map<String, dynamic> map) {
-    return CartItem(
-      cartProductName: map['cartProductName'] ?? '',
-      cartPrice: map['cartPrice'] ?? 0.0,
-      cartQuantity: map['cartQuantity'] ?? 0,
-      totalAmount: map['totalAmount'] ?? 0.0,
-    );
-  }
-  Map<String, dynamic> toMap() {
+  CartItem.fromMap(Map<String, dynamic> map)    
+      :cartProductName= map['cartProductName'],
+      cartPrice= map['cartPrice'],
+      cartQuantity= map['cartQuantity'],
+      totalAmount= map['totalAmount'];
+    
+  
+  
+   Map<String, dynamic> toMap() {
     return {
       'cartProductName': cartProductName,
       'cartPrice': cartPrice,

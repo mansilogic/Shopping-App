@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shoppingapp/main.dart';
+import 'package:shoppingapp/screens/ShowCart.dart';
 import 'package:shoppingapp/screens/cartitem.dart';
 import 'package:shoppingapp/screens/homepage.dart';
 import 'package:shoppingapp/screens/login.dart';
@@ -119,13 +120,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-   CartItem(),
-    const Center(
-      child: Text(
-        'Cart',
-        style: optionStyle,
-      ),
-    ),
+   CartItems(),
+    ShowCart(),
     const ManageProduct(),
   ];
 }

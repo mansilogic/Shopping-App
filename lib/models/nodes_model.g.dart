@@ -103,7 +103,7 @@ class CartItemAdapter extends TypeAdapter<CartItem> {
       cartProductName: fields[0] as String,
       cartPrice: fields[1] as int,
       cartQuantity: fields[2] as int,
-      totalAmount: fields[3] as double,
+      totalAmount: fields[3] as int,
     );
   }
 
