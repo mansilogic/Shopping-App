@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:shoppingapp/main.dart';
 import 'package:shoppingapp/screens/cartitem.dart';
+import 'package:shoppingapp/screens/homepage.dart';
 import 'package:shoppingapp/screens/login.dart';
 import 'package:shoppingapp/screens/manageproduct.dart';
 
@@ -30,21 +31,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  // static const List<Widget> _widgetOptions = <Widget>[
-  //   Text(
-  //     'Home',
-  //     style: optionStyle,
-  //   ),
-  //   Text(
-  //     'Cart',
-  //     style: optionStyle,
-  //   ),
-  //   Text(
-  //     'Manage Product',
-  //     style: optionStyle,
-  //   ),
-  // ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -133,14 +119,13 @@ class _BottomNavigationState extends State<BottomNavigation> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-    CartItem(),
-    Center(
+   CartItem(),
+    const Center(
       child: Text(
         'Cart',
         style: optionStyle,
       ),
     ),
-    // Manage Product screen within the BottomNavigationBar
-    ManageProduct(),
+    const ManageProduct(),
   ];
 }

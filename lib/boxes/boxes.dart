@@ -9,3 +9,6 @@ class Boxes{
 class ProductBox {
    static Box<Product> getData()=>Hive.box<Product>('product');
 }
+class CartBox {
+   static Box<CartItem> getData()=>Hive.box<CartItem>('addToCart');
+}

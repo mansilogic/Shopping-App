@@ -27,7 +27,7 @@ class _ManageProductState extends State<ManageProduct> {
         body: ValueListenableBuilder<Box<Product>>(
             valueListenable: Hive.box<Product>('product').listenable(),
             builder: (context, box, _) {
-             // box = Hive.box<Product>('product');
+              box = Hive.box<Product>('product');
 
               var data = box.values.toList().cast<Product>();
               return ListView.builder(
@@ -37,7 +37,6 @@ class _ManageProductState extends State<ManageProduct> {
                 itemBuilder: ((context, index) {
                   return Container(
                     child: Card(
-                      
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,8 +94,7 @@ class _ManageProductState extends State<ManageProduct> {
     );
   }
 
-  Future<void> _editDialog(Product product, String productname, String price,
-      String quantity) async {
+  Future<void> _editDialog(Product product, String productname, String price,String quantity) async {
     await Hive.openBox<Product>('product');
     productNameController.text = productname;
     priceController.text = price;
@@ -162,7 +160,7 @@ class _ManageProductState extends State<ManageProduct> {
               TextButton(
                   onPressed: () async {
                    final price = double.tryParse(priceController.text);
-                   final quantity = int.tryParse(quantityController.text); // Parse the input as an integer
+                   final quantity = int.tryParse(quantityController.text); 
   
                     if (price != null && quantity != null) {
 
@@ -211,9 +209,7 @@ class _ManageProductState extends State<ManageProduct> {
   }
 
   Future<void> _showMyDialog() async {
-   // await Hive.openBox<Product>('product');
-
-    await showDialog(
+      await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -276,10 +272,9 @@ class _ManageProductState extends State<ManageProduct> {
               TextButton(
                 onPressed: () {
                   final price = double.tryParse(priceController.text);
-                   final quantity = int.tryParse(quantityController.text); // Parse the input as an integer
+                  final quantity = int.tryParse(quantityController.text);
   
-                  final data = Product(productNameController.text,
-                      price!, quantity!);
+                  final data = Product(productNameController.text,price!, quantity!);
 
                   final box = Hive.box<Product>('product');
                   box.add(data);

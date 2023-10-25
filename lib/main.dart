@@ -8,8 +8,9 @@ import 'package:shoppingapp/screens/signup.dart';
 import 'models/nodes_model.dart';
 
 void main() async {
+  
   await Hive.initFlutter();
-  WidgetsFlutterBinding.ensureInitialized();
+ // WidgetsFlutterBinding.ensureInitialized();
   var directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
 
