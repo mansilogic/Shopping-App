@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shoppingapp/boxes/boxes.dart';
 import 'package:shoppingapp/screens/login.dart';
+import 'package:toast/toast.dart';
 
 import '../models/nodes_model.dart';
 
@@ -21,6 +22,8 @@ class _SignUpState extends State<SignUp> {
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  TextEditingController _confirmPassword = new TextEditingController();
+
   String name = '';
   String phoneNumber = '';
   String email = '';
@@ -28,11 +31,9 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: Scaffold(
+    return Scaffold(
+      
+      
           appBar: AppBar(
             title: const Center(
                 child: Text(
@@ -95,7 +96,8 @@ class _SignUpState extends State<SignUp> {
                                   ],
                                 ),
                                 Padding(
-                                  padding:const EdgeInsets.symmetric(horizontal: 40),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40),
                                   child: Column(children: [
                                     const SizedBox(
                                       height: 25,
@@ -109,8 +111,7 @@ class _SignUpState extends State<SignUp> {
                                               fontWeight: FontWeight.w500,
                                               color: Colors.black87),
                                         ),
-                                        const SizedBox(width: 10), // Add some spacing
-                              
+                                        const SizedBox(width: 10),
                                       ],
                                     ),
                                     TextFormField(
@@ -148,8 +149,7 @@ class _SignUpState extends State<SignUp> {
                                               fontWeight: FontWeight.w500,
                                               color: Colors.black87),
                                         ),
-                                           const SizedBox(width: 10), // Add some spacing
-                              
+                                        const SizedBox(width: 10),
                                       ],
                                     ),
                                     TextFormField(
@@ -186,8 +186,7 @@ class _SignUpState extends State<SignUp> {
                                               fontWeight: FontWeight.w500,
                                               color: Colors.black87),
                                         ),
-                                           const SizedBox(width: 10), // Add some spacing
-                              
+                                        const SizedBox(width: 10),
                                       ],
                                     ),
                                     TextFormField(
@@ -228,6 +227,7 @@ class _SignUpState extends State<SignUp> {
                                       ],
                                     ),
                                     TextFormField(
+                                      
                                       controller: passwordController,
                                       obscureText: true,
                                       validator: (value) {
@@ -253,20 +253,55 @@ class _SignUpState extends State<SignUp> {
                                     const SizedBox(
                                       height: 20,
                                     ),
+                                    Row(
+                                      children:const[
+                                        Text(
+                                          'Confirm Password',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black87),
+                                        ),
+                                      ],
+                                    ),
+                                    TextFormField(
+                                      controller: _confirmPassword,
+                                      obscureText: true,
+                                      validator: (value) {
+                                        if (value != passwordController.text) {
+                                          return 'Please enter correct password';
+                                        }
+                                      },
+                                      decoration: const InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                            color: Colors.grey,
+                                          ))),
+                                    ),
                                     ElevatedButton(
                                         onPressed: () {
                                           if (_formKey.currentState!
                                               .validate()) {
                                             _formKey.currentState!.save();
                                             _savedfunction();
+
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     const LogIn(),
                                               ),
                                             );
+                                            
                                           }
                                         },
+                                        style: ElevatedButton.styleFrom(
+                                          textStyle: TextStyle(fontSize: 20),
+                                        ),
                                         child: const Text('SIGN UP'))
                                   ]),
                                 )
@@ -278,24 +313,22 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
             ),
-          )),
-    );
+          ));
+    
   }
-void _savedfunction() async {
-  // Open the Hive box for your model
-  final nodeBox = await Hive.openBox<NodesModel>('notes');
-  
-  // Create a new user with the data from the form
-  final newUser = NodesModel(
-    nameController.text,
-    phoneController.text,
-    emailController.text,
-    passwordController.text,
-  );
 
-  // Add the new user to the Hive box
-  await nodeBox.add(newUser);
- final values = nodeBox.values;
+  void _savedfunction() async {
+    final nodeBox = await Hive.openBox<NodesModel>('notes');
+
+    final newUser = NodesModel(
+      nameController.text,
+      phoneController.text,
+      emailController.text,
+      passwordController.text,
+    );
+
+    await nodeBox.add(newUser);
+    final values = nodeBox.values;
 
     for (var node in values) {
       print('Name: ${node.name}');
@@ -303,9 +336,13 @@ void _savedfunction() async {
       print('Email: ${node.email}');
       print('Password: ${node.password}');
     }
-  // You can also close the box when you're done
-  await nodeBox.close();
-
-
-}
+    await nodeBox.close();
+     
+     Toast.show("Register Successfully.", duration: Toast.lengthShort, gravity:  Toast.lengthShort);
+      nameController.clear();
+      phoneController.clear();
+      emailController.clear();
+      passwordController.clear();
+      _confirmPassword.clear();   
+  }
 }

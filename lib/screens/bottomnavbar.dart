@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shoppingapp/main.dart';
+import 'package:shoppingapp/models/nodes_model.dart';
 import 'package:shoppingapp/screens/ShowCart.dart';
 import 'package:shoppingapp/screens/cartitem.dart';
 import 'package:shoppingapp/screens/homepage.dart';
@@ -16,13 +17,17 @@ class BottomNavigationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: BottomNavigation(),
+      home: BottomNavigation(
+        userEmail: '',
+      ),
     );
   }
 }
 
 class BottomNavigation extends StatefulWidget {
-  const BottomNavigation({super.key});
+  final String userEmail;
+  const BottomNavigation({super.key, required String? userEmail})
+      : userEmail = userEmail ?? '';
 
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
@@ -30,6 +35,8 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
+  late final String userEmail;
+
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   void _onItemTapped(int index) {
@@ -58,11 +65,26 @@ class _BottomNavigationState extends State<BottomNavigation> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                const DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Colors.green,
+                Container(
+                  height: 120,
+                  child: const DrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                    ),
+                    child: Text(
+                      'do shopping',
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
-                  child: Text('Drawer Header'),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.person,
+                  ),
+                  title: Text(
+                    widget.userEmail,
+                    style: TextStyle(fontSize: 15),
+                  ),
                 ),
                 ListTile(
                   leading: const Icon(
@@ -70,20 +92,29 @@ class _BottomNavigationState extends State<BottomNavigation> {
                   ),
                   title: const Text('Log Out'),
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const MyApp(),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.train,
-                  ),
-                  title: const Text('Page 2'),
-                  onTap: () {
-                    Navigator.pop(context);
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Confirm Logout'),
+                            content:
+                                const Text('Are you sure you want to logout?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancle'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  _handleLogout();
+                                },
+                                child: const Text('Logout'),
+                              ),
+                            ],
+                          );
+                        });
                   },
                 ),
               ],
@@ -120,8 +151,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-   CartItems(),
+    CartItems(),
     ShowCart(),
     const ManageProduct(),
   ];
+  void _handleLogout() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const MyApp(),
+      ),
+      (route) => false, 
+    );
+  }
 }

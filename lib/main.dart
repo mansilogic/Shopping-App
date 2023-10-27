@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shoppingapp/screens/login.dart';
 import 'package:shoppingapp/screens/signup.dart';
+import 'package:toast/toast.dart';
 
 import 'models/nodes_model.dart';
 
@@ -23,6 +24,7 @@ void main() async {
   Hive.registerAdapter(CartItemAdapter());
   await Hive.openBox<CartItem>('addToCart');
 
+
   runApp(const MaterialApp(home: MyApp()));
 }
 
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.green,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+   
       ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
